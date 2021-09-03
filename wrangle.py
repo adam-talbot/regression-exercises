@@ -54,3 +54,23 @@ def get_zillow_sfr_data():
         df.to_csv('zillow_sfr_df.csv')
         
     return df
+
+##################### Acquire and Prepare Zillow Data #####################
+
+def wrangle_zillow():
+    df = w.get_zillow_sfr_data()
+    df = df.dropna()
+    df = df.drop_duplicates()
+    df.fips = '0' + df.fips.astype('int').astype('string')
+    df.bedroomcnt = df.bedroomcnt.astype('int')
+    df.calculatedfinishedsquarefeet = df.calculatedfinishedsquarefeet.astype('int')
+    df.yearbuilt = df.yearbuilt.astype('int')
+    num_cols = df.select_dtypes('number').columns.tolist()
+    for col in num_cols:
+        Q1 = np.percentile(df[col], 25, interpolation='midpoint')
+        Q3 = np.percentile(df[col], 75, interpolation='midpoint')
+        IQR = Q3 - Q1
+        UB = Q3 + (1.5 * IQR)
+        LB = Q1 - (1.5 * IQR)
+        df = df[(df[col] < UB) & (df[col] > LB)]
+    return df
