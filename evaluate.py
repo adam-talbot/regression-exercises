@@ -68,6 +68,27 @@ def plot_residuals(x, y, yhat):
     plt.ylabel('Residual')
     plt.title('Model residuals');
     
+def plot_residuals_y(y, yhat):
+    '''
+    Takes in: independent variable (x), actual values for target (y), and predicted values for target (yhat)
+    Returns: a plot of baseline residuals and a plot of model residuals
+    '''
+    plt.figure(figsize = (11,5))
+
+    plt.subplot(121)
+    plt.scatter(y, y - y.mean())
+    plt.axhline(y = 0, ls = ':', color='black')
+    plt.xlabel('y')
+    plt.ylabel('Residual')
+    plt.title('Baseline Residuals')
+    
+    plt.subplot(122)
+    plt.scatter(y, y - yhat)
+    plt.axhline(y = 0, ls = ':', color='black')
+    plt.xlabel('y')
+    plt.ylabel('Residual')
+    plt.title('Model residuals');
+    
 def regression_errors_all(y, yhat):
     '''
     Takes in: actual values for target (y) and predicted values for target (yhat)
