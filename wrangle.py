@@ -67,9 +67,32 @@ def split_zillow(df):
     train, validate = train_test_split(train_validate, test_size=.11, random_state=123)
     return train, validate, test
 
+def wrangle_zillow_no_split():
+    '''
+    This function aquires and prepares zillow data
+    Returns df
+    '''
+    df = get_zillow_sfr_data()
+    df = df.dropna()
+    df = df.drop_duplicates()
+    df.fips = '0' + df.fips.astype('int').astype('string')
+    df.bedroomcnt = df.bedroomcnt.astype('int')
+    df.calculatedfinishedsquarefeet = df.calculatedfinishedsquarefeet.astype('int')
+    df.yearbuilt = df.yearbuilt.astype('int')
+    num_cols = df.select_dtypes('number').columns.tolist()
+    for col in num_cols:
+        Q1 = np.percentile(df[col], 25, interpolation='midpoint')
+        Q3 = np.percentile(df[col], 75, interpolation='midpoint')
+        IQR = Q3 - Q1
+        UB = Q3 + (1.5 * IQR)
+        LB = Q1 - (1.5 * IQR)
+        df = df[(df[col] < UB) & (df[col] > LB)]
+    return df
+
 def wrangle_zillow():
     '''
     This function aquires, prepares, and splits zillow data
+    Returns train, validate, and test dfs
     '''
     df = get_zillow_sfr_data()
     df = df.dropna()
